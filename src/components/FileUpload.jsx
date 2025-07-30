@@ -5,7 +5,6 @@ function FileUpload() {
   const [files, setFiles] = useState([]);
   const [uploadedFiles, setUploadedFiles] = useState([]);
 
-  // Load files on mount
   useEffect(() => {
     fetchFiles();
   }, []);
@@ -30,9 +29,20 @@ function FileUpload() {
     try {
       await axios.post(`${import.meta.env.VITE_API_URL}/upload`, formData);
       setFiles([]);
-      fetchFiles(); // Refresh list
+      fetchFiles();
     } catch (err) {
       console.error("Upload failed", err);
+    }
+  };
+
+  const handleDelete = async (filename) => {
+    if (!window.confirm(`Are you sure you want to delete "${filename}"?`)) return;
+
+    try {
+      await axios.delete(`${import.meta.env.VITE_API_URL}/files/${filename}`);
+      fetchFiles();
+    } catch (err) {
+      console.error("Delete failed", err);
     }
   };
 
@@ -66,7 +76,7 @@ function FileUpload() {
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {uploadedFiles.map((file, idx) => {
             const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(file.name);
-            const fileUrl = file.url || `${import.meta.env.VITE_API_URL}/${file.name}`;
+            const fileUrl = file.url || `${import.meta.env.VITE_API_URL}/uploads/${file.name}`;
 
             return (
               <div key={idx} className="bg-white p-3 rounded shadow text-center">
@@ -79,15 +89,23 @@ function FileUpload() {
                 ) : (
                   <div className="text-gray-700 mb-2">{file.name}</div>
                 )}
+
                 <a
                   href={fileUrl}
                   download
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-block mt-1 text-blue-600 underline text-sm"
+                  className="inline-block text-blue-600 underline text-sm mr-3"
                 >
                   Download
                 </a>
+
+                <button
+                  onClick={() => handleDelete(file.name)}
+                  className="text-red-600 text-sm hover:underline"
+                >
+                  Delete
+                </button>
               </div>
             );
           })}
