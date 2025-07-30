@@ -12,7 +12,7 @@ function FileUpload() {
 
   const fetchFiles = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/files");
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/files`);
       setUploadedFiles(res.data);
     } catch (err) {
       console.error("Error fetching files", err);
@@ -28,7 +28,7 @@ function FileUpload() {
     }
 
     try {
-      await axios.post("http://localhost:5000/upload", formData);
+      await axios.post(`${import.meta.env.VITE_API_URL}/upload`, formData);
       setFiles([]);
       fetchFiles(); // Refresh list
     } catch (err) {
@@ -66,7 +66,7 @@ function FileUpload() {
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {uploadedFiles.map((file, idx) => {
             const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(file.name);
-            const fileUrl = file.url || `http://localhost:5000/uploads/${file.name}`;
+            const fileUrl = file.url || `${import.meta.env.VITE_API_URL}/${file.name}`;
 
             return (
               <div key={idx} className="bg-white p-3 rounded shadow text-center">
